@@ -17,6 +17,7 @@ class Game:
         self.rooms = []
         self.commands = {}
         self.player = None
+        self.npc = None
     
     # Setup the game
     def setup(self):
@@ -32,64 +33,64 @@ class Game:
         
         # Setup rooms
         self.cave = Room("cave","")
-        self.rooms.append(cave)
+        self.rooms.append(self.cave)
         self.rituel = Room("salle de Rituel","")
-        self.rooms.append(rituel)
+        self.rooms.append(self.rituel)
         self.stock1 = Room("stockage 1","")
-        self.rooms.append(stock1)
+        self.rooms.append(self.stock1)
         self.clouloir1 = Room("couloir 1","")
-        self.rooms.append(clouloir1)
+        self.rooms.append(self.clouloir1)
         self.prison = Room("jaule","")
-        self.rooms.append(prison)
+        self.rooms.append(self.prison)
         self.sdb2 = Room("salle de bain 2","")
-        self.rooms.append(sdb2)
+        self.rooms.append(self.sdb2)
         self.ch2 = Room("chambre 2","")
-        self.rooms.append(ch2)
+        self.rooms.append(self.ch2)
         self.clouloir2 = Room("couloir 2","")
-        self.rooms.append(clouloir2)
+        self.rooms.append(self.clouloir2)
         self.stock2 = Room("stockage 2","")
-        self.rooms.append(stock2)
+        self.rooms.append(self.stock2)
         self.bureau = Room("bureau","")
-        self.rooms.append(bureau)
+        self.rooms.append(self.bureau)
         self.balcon = Room("balcon","")
-        self.rooms.append(balcon)
+        self.rooms.append(self.balcon)
         self.safe = Room("safe","")
-        self.rooms.append(safe)
+        self.rooms.append(self.safe)
         self.cuisine = Room("cuisine","")
-        self.rooms.append(cuisine)
+        self.rooms.append(self.cuisine)
         self.sam = Room("salle a manger","")
-        self.rooms.append(sam)
+        self.rooms.append(self.sam)
         self.salon = Room("salon","")
-        self.rooms.append(salon)
+        self.rooms.append(self.salon)
         self.ch1 = Room("chambre 1","")
-        self.rooms.append(ch1)
+        self.rooms.append(self.ch1)
         self.sdb1 = Room("Salle de bain 1","")
-        self.rooms.append(sdb1)
+        self.rooms.append(self.sdb1)
         # Create exits for rooms
 
-        self.cave.exits = {"N": stock1, "E": None, "S": cuisine, "O": None}
-        self.rituel.exits = {"N": None, "E": None, "S": clouloir1, "O": stock1}
-        self.stock1.exits = {"N": safe, "E": rituel, "S": cave, "O": None}
-        self.clouloir1.exits = {"N": rituel, "E": prison, "S": None, "O": None}
-        self.prison.exits = {"N": None, "E": None, "S": None, "O": clouloir1}
-        self.sdb2.exits = {"N": None, "E": None, "S": ch2, "O": None}
-        self.ch2.exits = {"N": sdb2, "E": clouloir2, "S": None, "O": None}
-        self.clouloir2.exits = {"N": stock2, "E": balcon, "S": None, "O": ch2}
-        self.stock2.exits = {"N": None, "E": None, "S": clouloir2, "O": None}
-        self.bureau.exits = {"N": clouloir1, "E": None, "S": balcon, "O": None}
-        self.balcon.exits = {"N": bureau, "E": safe, "S": salon, "O": clouloir2}
-        self.safe.exits = {"N": None, "E": stock1, "S": None, "O": balcon}
-        self.cuisine.exits = {"N": cave, "E": sam, "S": None, "O": None}
-        self.sam.exits = {"N": None, "E": salon, "S": None, "O": cuisine}
-        self.salon.exits = {"N": balcon, "E": ch1, "S": None, "O": sam}
-        self.ch1.exits = {"N": None, "E": sdb1, "S": None, "O": salon}
-        self.sdb1.exits = {"N": None, "E": None, "S": None, "O": ch1}
+        self.cave.exits = {"N": self.stock1, "E": None, "S": self.cuisine, "O": None}
+        self.rituel.exits = {"N": None, "E": None, "S": self.clouloir1, "O": self.stock1}
+        self.stock1.exits = {"N": self.safe, "E": self.rituel, "S": self.cave, "O": None}
+        self.clouloir1.exits = {"N": self.rituel, "E": self.prison, "S": None, "O": None}
+        self.prison.exits = {"N": None, "E": None, "S": None, "O": self.clouloir1}
+        self.sdb2.exits = {"N": None, "E": None, "S": self.ch2, "O": None}
+        self.ch2.exits = {"N": self.sdb2, "E": self.clouloir2, "S": None, "O": None}
+        self.clouloir2.exits = {"N": self.stock2, "E": self.balcon, "S": None, "O": self.ch2}
+        self.stock2.exits = {"N": None, "E": None, "S": self.clouloir2, "O": None}
+        self.bureau.exits = {"N": self.clouloir1, "E": None, "S": self.balcon, "O": None}
+        self.balcon.exits = {"N": self.bureau, "E": self.safe, "S": self.salon, "O": self.clouloir2}
+        self.safe.exits = {"N": None, "E": self.stock1, "S": None, "O": self.balcon}
+        self.cuisine.exits = {"N": self.cave, "E": self.sam, "S": None, "O": None}
+        self.sam.exits = {"N": None, "E": self.salon, "S": None, "O": self.cuisine}
+        self.salon.exits = {"N": self.balcon, "E": self.ch1, "S": None, "O": self.sam}
+        self.ch1.exits = {"N": None, "E": self.sdb1, "S": None, "O": self.salon}
+        self.sdb1.exits = {"N": None, "E": None, "S": None, "O": self.ch1}
 
 
         # Setup player and starting room
 
         self.player = Player(input("\nEntrez votre nom: "))
-        self.player.current_room = salon
+        self.player.current_room = self.salon
 
     # Play the game
     def play(self):
