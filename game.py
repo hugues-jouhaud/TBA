@@ -6,6 +6,7 @@ from room import Room
 from player import Player
 from command import Command
 from actions import Actions
+from npc import Monstre
 
 class Game:
 
@@ -29,33 +30,65 @@ class Game:
         self.commands["go"] = go
         
         # Setup rooms
-
-        forest = Room("Forest", "dans une forêt enchantée. Vous entendez une brise légère à travers la cime des arbres.")
-        self.rooms.append(forest)
-        tower = Room("Tower", "dans une immense tour en pierre qui s'élève au dessus des nuages.")
-        self.rooms.append(tower)
-        cave = Room("Cave", "dans une grotte profonde et sombre. Des voix semblent provenir des profondeurs.")
+        cave = room("cave","")
         self.rooms.append(cave)
-        cottage = Room("Cottage", "dans un petit chalet pittoresque avec un toit de chaume. Une épaisse fumée verte sort de la cheminée.")
-        self.rooms.append(cottage)
-        swamp = Room("Swamp", "dans un marécage sombre et ténébreux. L'eau bouillonne, les abords sont vaseux.")
-        self.rooms.append(swamp)
-        castle = Room("Castle", "dans un énorme château fort avec des douves et un pont levis. Sur les tours, des flèches en or massif.")
-        self.rooms.append(castle)
-
+        rituel = room("salle de Rituel","")
+        self.rooms.append(rituel)
+        stock1 = room("stockage 1","")
+        self.rooms.append(stock1)
+        clouloir1 = room("couloir 1","")
+        self.rooms.append(clouloir1)
+        Prison = room("jaule","")
+        self.rooms.append(Prison)
+        SDB2 = room("salle de bain 2","")
+        self.rooms.append(SDB2)
+        ch2 = room("chambre 2","")
+        self.rooms.append(ch2)
+        clouloir2 = room("couloir 2","")
+        self.rooms.append(clouloir2)
+        stock2 = room("stockage 2","")
+        self.rooms.append(stock2)
+        bureau = room("bureau","")
+        self.rooms.append(bureau)
+        balcon = room("balcon","")
+        self.rooms.append(balcon)
+        safe = room("safe","")
+        self.rooms.append(safe)
+        cuisine = room("cuisine","")
+        self.rooms.append(cuisine)
+        sam = room("salle a manger","")
+        self.rooms.append(sam)
+        salon = room("salon","")
+        self.rooms.append(salon)
+        ch1 = room("chambre 1","")
+        self.rooms.append(ch1)
+        sdb1 = room("Salle de bain 1","")
+        self.rooms.append(sdb1)
         # Create exits for rooms
 
-        forest.exits = {"N" : cave, "E" : tower, "S" : castle, "O" : None}
-        tower.exits = {"N" : cottage, "E" : None, "S" : swamp, "O" : forest}
-        cave.exits = {"N" : None, "E" : cottage, "S" : forest, "O" : None}
-        cottage.exits = {"N" : None, "E" : None, "S" : tower, "O" : cave}
-        swamp.exits = {"N" : tower, "E" : None, "S" : None, "O" : castle}
-        castle.exits = {"N" : forest, "E" : swamp, "S" : None, "O" : None}
+        cave.exits = {"N": stock1, "E": None, "S": cuisine, "O": None}
+        rituel.exits = {"N": None, "E": None, "S": clouloir1, "O": stock1}
+        stock1.exits = {"N": safe, "E": rituel, "S": cave, "O": None}
+        clouloir1.exits = {"N": rituel, "E": Prison, "S": None, "O": None}
+        Prison.exits = {"N": None, "E": None, "S": None, "O": clouloir1}
+        SDB2.exits = {"N": None, "E": None, "S": ch2, "O": None}
+        ch2.exits = {"N": SDB2, "E": clouloir2, "S": None, "O": None}
+        clouloir2.exits = {"N": stock2, "E": balcon, "S": None, "O": ch2}
+        stock2.exits = {"N": None, "E": None, "S": clouloir2, "O": None}
+        bureau.exits = {"N": clouloir1, "E": None, "S": balcon, "O": None}
+        balcon.exits = {"N": bureau, "E": safe, "S": salon, "O": clouloir2}
+        safe.exits = {"N": None, "E": stock1, "S": None, "O": balcon}
+        cuisine.exits = {"N": cave, "E": sam, "S": None, "O": None}
+        sam.exits = {"N": None, "E": salon, "S": None, "O": sam}
+        salon.exits = {"N": balcon, "E": ch1, "S": None, "O": sam}
+        ch1.exits = {"N": None, "E": sdb1, "S": None, "O": salon}
+        sdb1.exits = {"N": None, "E": None, "S": None, "O": ch1}
+
 
         # Setup player and starting room
 
         self.player = Player(input("\nEntrez votre nom: "))
-        self.player.current_room = swamp
+        self.player.current_room = salon
 
     # Play the game
     def play(self):
