@@ -6,7 +6,7 @@ from room import Room
 from player import Player
 from command import Command
 from actions import Actions
-from NPC import Monstre
+from npc import Monstre
 
 
 class Game:
@@ -97,8 +97,34 @@ class Game:
         self.print_welcome()
         # Loop until the game is finished
         while not self.finished:
+            # --- Déplacement du joueur ---
             # Get the command from the player
             self.process_command(input("> "))
+
+            if self.finished:
+                break
+            
+            # --- LOGIQUE DU MONSTRE ---
+            if self.npc is None:
+                if self.player.current_room == self.monster_trigger_room:
+                    self.spawn_monster()
+            else:
+                # OUI. Le monstre existe, on le fait jouer.
+                self.npc.move() 
+                distance = self.npc.distance_du_joueur(self.player.current_room)
+
+                if distance == 0:
+                    print("\n!!!! ATTENTION !!!!")
+                    
+                    # Message générique
+                    print("Le monstre est dans la même pièce que vous !")
+                
+                elif distance == 1:
+                    print("Vous entendez des bruits de pas tout proches...")
+                
+                elif distance == 2:
+                    print("Un grognement résonne au loin.")
+
         return None
 
     # Process the command entered by the player
