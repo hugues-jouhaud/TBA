@@ -31,59 +31,59 @@ class Game:
         self.commands["go"] = go
         
         # Setup rooms
-        cave = Room("cave","")
+        self.cave = Room("cave","")
         self.rooms.append(cave)
-        rituel = Room("salle de Rituel","")
+        self.rituel = Room("salle de Rituel","")
         self.rooms.append(rituel)
-        stock1 = Room("stockage 1","")
+        self.stock1 = Room("stockage 1","")
         self.rooms.append(stock1)
-        clouloir1 = Room("couloir 1","")
+        self.clouloir1 = Room("couloir 1","")
         self.rooms.append(clouloir1)
-        prison = Room("jaule","")
+        self.prison = Room("jaule","")
         self.rooms.append(prison)
-        sdb2 = Room("salle de bain 2","")
+        self.sdb2 = Room("salle de bain 2","")
         self.rooms.append(sdb2)
-        ch2 = Room("chambre 2","")
+        self.ch2 = Room("chambre 2","")
         self.rooms.append(ch2)
-        clouloir2 = Room("couloir 2","")
+        self.clouloir2 = Room("couloir 2","")
         self.rooms.append(clouloir2)
-        stock2 = Room("stockage 2","")
+        self.stock2 = Room("stockage 2","")
         self.rooms.append(stock2)
-        bureau = Room("bureau","")
+        self.bureau = Room("bureau","")
         self.rooms.append(bureau)
-        balcon = Room("balcon","")
+        self.balcon = Room("balcon","")
         self.rooms.append(balcon)
-        safe = Room("safe","")
+        self.safe = Room("safe","")
         self.rooms.append(safe)
-        cuisine = Room("cuisine","")
+        self.cuisine = Room("cuisine","")
         self.rooms.append(cuisine)
-        sam = Room("salle a manger","")
+        self.sam = Room("salle a manger","")
         self.rooms.append(sam)
-        salon = Room("salon","")
+        self.salon = Room("salon","")
         self.rooms.append(salon)
-        ch1 = Room("chambre 1","")
+        self.ch1 = Room("chambre 1","")
         self.rooms.append(ch1)
-        sdb1 = Room("Salle de bain 1","")
+        self.sdb1 = Room("Salle de bain 1","")
         self.rooms.append(sdb1)
         # Create exits for rooms
 
-        cave.exits = {"N": stock1, "E": None, "S": cuisine, "O": None}
-        rituel.exits = {"N": None, "E": None, "S": clouloir1, "O": stock1}
-        stock1.exits = {"N": safe, "E": rituel, "S": cave, "O": None}
-        clouloir1.exits = {"N": rituel, "E": prison, "S": None, "O": None}
-        prison.exits = {"N": None, "E": None, "S": None, "O": clouloir1}
-        sdb2.exits = {"N": None, "E": None, "S": ch2, "O": None}
-        ch2.exits = {"N": sdb2, "E": clouloir2, "S": None, "O": None}
-        clouloir2.exits = {"N": stock2, "E": balcon, "S": None, "O": ch2}
-        stock2.exits = {"N": None, "E": None, "S": clouloir2, "O": None}
-        bureau.exits = {"N": clouloir1, "E": None, "S": balcon, "O": None}
-        balcon.exits = {"N": bureau, "E": safe, "S": salon, "O": clouloir2}
-        safe.exits = {"N": None, "E": stock1, "S": None, "O": balcon}
-        cuisine.exits = {"N": cave, "E": sam, "S": None, "O": None}
-        sam.exits = {"N": None, "E": salon, "S": None, "O": cuisine}
-        salon.exits = {"N": balcon, "E": ch1, "S": None, "O": sam}
-        ch1.exits = {"N": None, "E": sdb1, "S": None, "O": salon}
-        sdb1.exits = {"N": None, "E": None, "S": None, "O": ch1}
+        self.cave.exits = {"N": stock1, "E": None, "S": cuisine, "O": None}
+        self.rituel.exits = {"N": None, "E": None, "S": clouloir1, "O": stock1}
+        self.stock1.exits = {"N": safe, "E": rituel, "S": cave, "O": None}
+        self.clouloir1.exits = {"N": rituel, "E": prison, "S": None, "O": None}
+        self.prison.exits = {"N": None, "E": None, "S": None, "O": clouloir1}
+        self.sdb2.exits = {"N": None, "E": None, "S": ch2, "O": None}
+        self.ch2.exits = {"N": sdb2, "E": clouloir2, "S": None, "O": None}
+        self.clouloir2.exits = {"N": stock2, "E": balcon, "S": None, "O": ch2}
+        self.stock2.exits = {"N": None, "E": None, "S": clouloir2, "O": None}
+        self.bureau.exits = {"N": clouloir1, "E": None, "S": balcon, "O": None}
+        self.balcon.exits = {"N": bureau, "E": safe, "S": salon, "O": clouloir2}
+        self.safe.exits = {"N": None, "E": stock1, "S": None, "O": balcon}
+        self.cuisine.exits = {"N": cave, "E": sam, "S": None, "O": None}
+        self.sam.exits = {"N": None, "E": salon, "S": None, "O": cuisine}
+        self.salon.exits = {"N": balcon, "E": ch1, "S": None, "O": sam}
+        self.ch1.exits = {"N": None, "E": sdb1, "S": None, "O": salon}
+        self.sdb1.exits = {"N": None, "E": None, "S": None, "O": ch1}
 
 
         # Setup player and starting room
@@ -106,7 +106,7 @@ class Game:
             
             # --- LOGIQUE DU MONSTRE ---
             if self.npc is None:
-                if self.player.current_room == self.monster_trigger_room:
+                if self.player.current_room == self.rituel:
                     self.spawn_monster()
             else:
                 # OUI. Le monstre existe, on le fait jouer.
@@ -126,6 +126,18 @@ class Game:
                     print("Un grognement résonne au loin.")
 
         return None
+
+    def spawn_monster(self):
+        """Crée le monstre et le place dans sa salle de spawn."""
+
+        self.npc = Monstre()
+        self.npc.current_room = self.salon
+        
+        # Message générique
+        print("\n-----------------------------------------------------")
+        print("Un rugissement glacial secoue le manoir...")
+        print(f"Vous avez réveillé un monstre ! Il est dans le {self.npc.current_room.name}.")
+        print("-----------------------------------------------------\n")
 
     # Process the command entered by the player
     def process_command(self, command_string) -> None:
