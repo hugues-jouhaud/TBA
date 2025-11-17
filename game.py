@@ -6,7 +6,8 @@ from room import Room
 from player import Player
 from command import Command
 from actions import Actions
-from npc import Monstre
+from NPC import Monstre
+
 
 class Game:
 
@@ -30,56 +31,56 @@ class Game:
         self.commands["go"] = go
         
         # Setup rooms
-        cave = room("cave","")
+        cave = Room("cave","")
         self.rooms.append(cave)
-        rituel = room("salle de Rituel","")
+        rituel = Room("salle de Rituel","")
         self.rooms.append(rituel)
-        stock1 = room("stockage 1","")
+        stock1 = Room("stockage 1","")
         self.rooms.append(stock1)
-        clouloir1 = room("couloir 1","")
+        clouloir1 = Room("couloir 1","")
         self.rooms.append(clouloir1)
-        Prison = room("jaule","")
-        self.rooms.append(Prison)
-        SDB2 = room("salle de bain 2","")
-        self.rooms.append(SDB2)
-        ch2 = room("chambre 2","")
+        prison = Room("jaule","")
+        self.rooms.append(prison)
+        sdb2 = Room("salle de bain 2","")
+        self.rooms.append(sdb2)
+        ch2 = Room("chambre 2","")
         self.rooms.append(ch2)
-        clouloir2 = room("couloir 2","")
+        clouloir2 = Room("couloir 2","")
         self.rooms.append(clouloir2)
-        stock2 = room("stockage 2","")
+        stock2 = Room("stockage 2","")
         self.rooms.append(stock2)
-        bureau = room("bureau","")
+        bureau = Room("bureau","")
         self.rooms.append(bureau)
-        balcon = room("balcon","")
+        balcon = Room("balcon","")
         self.rooms.append(balcon)
-        safe = room("safe","")
+        safe = Room("safe","")
         self.rooms.append(safe)
-        cuisine = room("cuisine","")
+        cuisine = Room("cuisine","")
         self.rooms.append(cuisine)
-        sam = room("salle a manger","")
+        sam = Room("salle a manger","")
         self.rooms.append(sam)
-        salon = room("salon","")
+        salon = Room("salon","")
         self.rooms.append(salon)
-        ch1 = room("chambre 1","")
+        ch1 = Room("chambre 1","")
         self.rooms.append(ch1)
-        sdb1 = room("Salle de bain 1","")
+        sdb1 = Room("Salle de bain 1","")
         self.rooms.append(sdb1)
         # Create exits for rooms
 
         cave.exits = {"N": stock1, "E": None, "S": cuisine, "O": None}
         rituel.exits = {"N": None, "E": None, "S": clouloir1, "O": stock1}
         stock1.exits = {"N": safe, "E": rituel, "S": cave, "O": None}
-        clouloir1.exits = {"N": rituel, "E": Prison, "S": None, "O": None}
-        Prison.exits = {"N": None, "E": None, "S": None, "O": clouloir1}
-        SDB2.exits = {"N": None, "E": None, "S": ch2, "O": None}
-        ch2.exits = {"N": SDB2, "E": clouloir2, "S": None, "O": None}
+        clouloir1.exits = {"N": rituel, "E": prison, "S": None, "O": None}
+        prison.exits = {"N": None, "E": None, "S": None, "O": clouloir1}
+        sdb2.exits = {"N": None, "E": None, "S": ch2, "O": None}
+        ch2.exits = {"N": sdb2, "E": clouloir2, "S": None, "O": None}
         clouloir2.exits = {"N": stock2, "E": balcon, "S": None, "O": ch2}
         stock2.exits = {"N": None, "E": None, "S": clouloir2, "O": None}
         bureau.exits = {"N": clouloir1, "E": None, "S": balcon, "O": None}
         balcon.exits = {"N": bureau, "E": safe, "S": salon, "O": clouloir2}
         safe.exits = {"N": None, "E": stock1, "S": None, "O": balcon}
         cuisine.exits = {"N": cave, "E": sam, "S": None, "O": None}
-        sam.exits = {"N": None, "E": salon, "S": None, "O": sam}
+        sam.exits = {"N": None, "E": salon, "S": None, "O": cuisine}
         salon.exits = {"N": balcon, "E": ch1, "S": None, "O": sam}
         ch1.exits = {"N": None, "E": sdb1, "S": None, "O": salon}
         sdb1.exits = {"N": None, "E": None, "S": None, "O": ch1}
