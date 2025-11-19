@@ -14,6 +14,8 @@ class Game:
         self.commands = {}
         self.player = None
         self.npc = None
+        self.debug = True
+        self.qte_count = 0
     
     # Setup the game
     def setup(self):
@@ -24,23 +26,23 @@ class Game:
         self.commands["inv"] = Command("inv", " : Affiche l’inventaire du joueur", Actions.action_inv, 0)
 
         # --- SALLES ---
-        self.cave = Room("cave","")
-        self.rituel = Room("salle de Rituel","")
-        self.stock1 = Room("stockage 1","")
-        self.clouloir1 = Room("couloir 1","")
-        self.prison = Room("jaule","")
-        self.sdb2 = Room("salle de bain 2","")
-        self.ch2 = Room("chambre 2","")
-        self.clouloir2 = Room("couloir 2","")
-        self.stock2 = Room("stockage 2","")
-        self.bureau = Room("bureau","")
-        self.balcon = Room("balcon","")
-        self.safe = Room("safe","")
-        self.cuisine = Room("cuisine","")
-        self.sam = Room("salle a manger","")
-        self.salon = Room("salon","")
-        self.ch1 = Room("chambre 1","")
-        self.sdb1 = Room("Salle de bain 1","")
+        self.cave = Room("Cave", "dans une cave sombre et humide")
+        self.rituel = Room("Salle de Rituel", "dans une pièce étrange avec des symboles au sol")
+        self.stock1 = Room("Stockage 1", "dans un débarras encombré")
+        self.clouloir1 = Room("Couloir 1", "dans un long couloir sombre")
+        self.prison = Room("Jaule", "enfermé dans une vieille geôle")
+        self.sdb2 = Room("Salle de bain 2", "dans une salle de bain délabrée")
+        self.ch2 = Room("Chambre 2", "dans une chambre d'amis poussiéreuse")
+        self.clouloir2 = Room("Couloir 2", "dans le couloir de l'étage")
+        self.stock2 = Room("Stockage 2", "dans une petite réserve à provisions")
+        self.bureau = Room("Bureau", "dans un grand bureau rempli de livres")
+        self.balcon = Room("Balcon", "sur le balcon, vous avez une vue dégagée sur le salon")
+        self.safe = Room("Safe", "dans une pièce blindée et sécurisée")
+        self.cuisine = Room("Cuisine", "dans une cuisine aux couteaux rouillés")
+        self.sam = Room("Salle a manger", "dans une grande salle à manger")
+        self.salon = Room("Salon", "dans un salon confortable avec une cheminée")
+        self.ch1 = Room("Chambre 1", "dans la chambre principale")
+        self.sdb1 = Room("Salle de bain 1", "dans une petite salle de bain carrelée")
 
         self.rooms.extend([
             self.cave, self.rituel, self.stock1, self.clouloir1, self.prison,
@@ -77,8 +79,6 @@ class Game:
         self.setup()
         self.print_welcome()
         while not self.finished:
-            command_input = input("> ").strip()
-            self.process_command(command_input)
             # --- DEBUG ---
             if self.debug and self.npc:
                 print(f"[DEBUG] Monstre: {self.npc.current_room.name} (Stun: {self.npc.stunned_turns})")
@@ -87,6 +87,10 @@ class Game:
             user_input = input("> ")
             if not user_input:
                 continue
+            words = user_input.split() 
+            if not words:
+                continue
+            
 
             if self.finished:
                 break
@@ -113,8 +117,15 @@ class Game:
 
             # --- TRAITEMENT DE LA COMMANDE ---
             # On ne bouge pas si on s'est fait intercepter
+            # Sinon :
             if not monster_intercepted:
                 self.process_command(user_input)
+
+                # On vient de bouger, on vérifie si on est tombé nez à nez avec le monstre
+                if self.npc is not None and self.npc.current_room == self.player.current_room:
+                    # On vérifie s'il est stun (car s'il dort, pas de QTE)
+                    if self.npc.stunned_turns == 0:
+                        self.trigger_qte()
             
             if self.finished:
                 break
@@ -180,12 +191,6 @@ class Game:
                 self.finished = True
                 print("\n=== VOUS ÊTES MORT ===")
             return False
-
-    # Process the command entered by the player
-    def process_command(self, command_string) -> None:
-
-        # Split the command string into a list of words
-        list_of_words = command_string.split(" ")
 
     def process_command(self, command_string):
         if not command_string:
