@@ -8,6 +8,8 @@ from command import Command
 from actions import Actions
 from npc import Monstre
 
+import time
+import random
 
 class Game:
 
@@ -18,6 +20,16 @@ class Game:
         self.commands = {}
         self.player = None
         self.npc = None
+
+        self.qte_count = 0 # Compteur de QTE pour augmenter la difficulté
+
+        #Variables pour le spawn
+        self.monster_spawn_room = None
+        self.rituel = None
+
+        # --- DEBUG MODE ---
+        # Mettre à True pour voir où est le monstre
+        self.debug = True
     
     # Setup the game
     def setup(self):
@@ -98,33 +110,61 @@ class Game:
         self.print_welcome()
         # Loop until the game is finished
         while not self.finished:
+            # --- DEBUG ---
+            if self.debug and self.npc:
+                print(f"[DEBUG] Monstre: {self.npc.current_room.name} (Stun: {self.npc.stunned_turns})")
             # --- Déplacement du joueur ---
             # Get the command from the player
-            self.process_command(input("> "))
+            user_input = input("> ")
+            if not user_input:
+                continue
 
             if self.finished:
                 break
             
             # --- LOGIQUE DU MONSTRE ---
+            # Le monstre bouge SEULEMENT si la commande est "go"
+            monster_intercepted = False
+
+            words = user_input.split()     # <-- On coupe la phrase
+            command_word = words[0]        # <-- On prend le 1er mot
+            
+            if self.npc is not None and command_word == "go":
+
+                # Mob stun ?
+                etais_stun = self.npc.stunned_turns > 0
+
+                # Le monstre bouge
+                self.npc.move()
+                
+                # S'il arrive sur nous (Interception)
+                if self.npc.current_room == self.player.current_room and not etais_stun:
+                    monster_intercepted = True
+                    self.trigger_qte()
+
+            # --- TRAITEMENT DE LA COMMANDE ---
+            # On ne bouge pas si on s'est fait intercepter
+            if not monster_intercepted:
+                self.process_command(user_input)
+            
+            if self.finished:
+                break
+
+            # --- GESTION DU SPAWN ---
             if self.npc is None:
                 if self.player.current_room == self.rituel:
                     self.spawn_monster()
-            else:
-                # OUI. Le monstre existe, on le fait jouer.
-                self.npc.move() 
-                distance = self.npc.distance_du_joueur(self.player.current_room)
-
-                if distance == 0:
-                    print("\n!!!! ATTENTION !!!!")
-                    
-                    # Message générique
-                    print("Le monstre est dans la même pièce que vous !")
-                
-                elif distance == 1:
-                    print("Vous entendez des bruits de pas tout proches...")
-                
-                elif distance == 2:
-                    print("Un grognement résonne au loin.")
+            
+            # --- MESSAGES D'AMBIANCE (Distance) ---
+            # On vérifie la distance APRÈS tous les mouvements
+            elif self.npc is not None:
+                # Si on ne s'est pas fait attaquer ce tour-ci, on donne des indices
+                if self.npc.current_room != self.player.current_room:
+                    distance = self.npc.distance_du_joueur(self.player.current_room)
+                    if distance == 1:
+                        print("\n--> Vous entendez des bruits de pas tout proches...")
+                    elif distance == 2:
+                        print("\n--> Un grognement résonne au loin.")
 
         return None
 
@@ -139,6 +179,44 @@ class Game:
         print("Un rugissement glacial secoue le manoir...")
         print(f"Vous avez réveillé un monstre ! Il est dans le {self.npc.current_room.name}.")
         print("-----------------------------------------------------\n")
+
+    def trigger_qte(self):
+        """Gère le Quick Time Event."""
+        print("\n" + "!"*40)
+        print("SURPRISE ! LE MONSTRE VOUS FONCE DESSUS !")
+        print("!"*40)
+
+        length = 3 + (self.qte_count * 2)
+        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        target_word = ''.join(random.choice(alphabet) for i in range(length))
+
+        print(f"\nVous avez 5 secondes pour taper : {target_word}")
+        
+        start_time = time.time()
+        user_input = input("CODE > ")
+        end_time = time.time()
+        
+        duration = end_time - start_time
+
+        if user_input == target_word and duration <= 5.0:
+            print(f"\nSUCCÈS ! (Temps: {round(duration, 2)}s)")
+            print("Vous repoussez le monstre ! Il est étourdi pour 3 tours.")
+            self.npc.stunned_turns = 3 
+            self.qte_count += 1        
+            return True
+            
+        else:
+            print(f"\nÉCHEC ! (Temps: {round(duration, 2)}s)")
+            if user_input != target_word:
+                print(f"Le code était incorrect (Attendu: {target_word}).")
+            else:
+                print("Trop lent !")
+            self.player.hp -= 1
+            print(f"Le monstre vous blesse ! Il vous reste {self.player.hp} PV.")
+            if self.player.hp <= 0:
+                self.finished = True
+                print("\n=== VOUS ÊTES MORT ===")
+            return False
 
     # Process the command entered by the player
     def process_command(self, command_string) -> None:

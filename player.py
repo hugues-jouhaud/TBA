@@ -5,6 +5,7 @@ class Player():
     def __init__(self, name):
         self.name = name
         self.current_room = None
+        self.hp = 2 # Le joueur début avec deux PV.
     
     # Define the move method.
     def move(self, direction):

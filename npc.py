@@ -13,6 +13,7 @@ class Monstre:
         Initialise le monstre.
         """
         self.current_room = None  # La salle actuelle
+        self.stunned_turns = 0 # Compteur des tours stun restant
     
     def distance_du_joueur(self, player_room):
         """
@@ -78,12 +79,18 @@ class Monstre:
         if not self.current_room:
             return
 
-        # 1. Lister les sorties qui ne sont pas "None"
+        # 1. Gestion de l'étourdissement ---
+        if self.stunned_turns > 0:
+            self.stunned_turns -= 1
+            print(f"(Le monstre est étourdi, il lui reste {self.stunned_turns} tours)")
+            return
+
+        # 2. Lister les sorties qui ne sont pas "None"
         sorties_valides = [
             salle for salle in self.current_room.exits.values()
             if salle is not None
         ]
 
-        # 2. Choisir une salle aléatoire et déplacé le monstre dedans.
+        # 3. Choisir une salle aléatoire et déplacé le monstre dedans.
         nouvelle_salle = random.choice(sorties_valides)
         self.current_room = nouvelle_salle
