@@ -18,7 +18,7 @@ Il y a pour le moment 5 modules contenant chacun une classe.
 
 ## 🗺️ Carte du jeu (après modifications)
 
-Voici la carte du jeu mise à jour après les modifications fonctionnelles (Ex. 3 & 4):
+Voici la carte du jeu mise à jour après les modifications fonctionnelles:
 
 * **Forest** peut aller vers : Cave (N), Castle (S).
 * **Tower** peut aller vers : Cottage (N).
@@ -35,5 +35,5 @@ Voici la carte du jeu mise à jour après les modifications fonctionnelles (Ex. 
 
 ## 📊 Diagramme des Classes
 
-Voici le diagramme de classe représentant la structure des commandes et actions dans le jeu.
-[Diagramme de classe Command/Actions](diagramme.png)
+Voici le diagramme de classe représentant la structure de la class Games dans le jeu.
+[Diagramme de la classe Games](diagrame.png)
