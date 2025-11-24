@@ -27,6 +27,11 @@ class Player:
         """
         Déplace le joueur dans la direction donnée si possible.
         """
+
+        if direction not in ["N","S","O","E","U","D"] :
+            print("\nCette direction n'existe pas !\n")
+            return False
+        
         next_room = self.current_room.exits.get(direction)
 
         if next_room is None:
