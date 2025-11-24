@@ -63,3 +63,12 @@ class Actions:
         game.player.inventory.show()
         print()
         return True
+    @staticmethod
+    def action_history(game, list_of_words, number_of_parameters):
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            print(MSG0.format(command_word=list_of_words[0]))
+            return False
+        
+        print(game.player.get_history())
+        return True

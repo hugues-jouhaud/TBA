@@ -24,6 +24,7 @@ class Game:
         self.commands["quit"] = Command("quit", " : quitter le jeu", Actions.quit, 0)
         self.commands["go"] = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O)", Actions.go, 1)
         self.commands["inv"] = Command("inv", " : Affiche l’inventaire du joueur", Actions.action_inv, 0)
+        self.commands["history"] = Command("history", " : Affiche les pièces déjà visitées", Actions.action_history, 0)
 
         # --- SALLES ---
         self.cave = Room("Cave", "dans une cave sombre et humide")

@@ -11,6 +11,8 @@ class Player:
         self.inventory = Inventory()
         self.current_room = None
         self.hp = 2 # Le joueur début avec deux PV.
+        self.room_history = []
+        self.prev_room = None
     
     # Define the move method.
 
@@ -38,6 +40,25 @@ class Player:
             print("\nAucune porte dans cette direction !\n")
             return False
 
+        # Ajout de la description de la pièce actuelle à l'historique AVANT de bouger
+        if self.current_room.description not in self.room_history:
+            self.room_history.append(self.current_room.description)
+        self.prev_room = self.current_room.name
+
+
         self.current_room = next_room
         print(self.current_room.get_long_description())
+        print(self.prev_room)
         return True
+
+    def get_history(self):
+        if not self.room_history:
+            return ""
+            
+        history_string = "\nVous avez déja visité les pièces suivantes:"
+        for description in self.room_history:
+
+            description_cleaned = description.replace("dans ", "")
+            history_string += f"\n\t- {description_cleaned}"
+            
+        return history_string
