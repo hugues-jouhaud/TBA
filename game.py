@@ -52,23 +52,23 @@ class Game:
         ])
 
         # --- EXITS ---
-        self.cave.exits = {"N": self.stock1, "E": None, "S": self.cuisine, "O": None}
-        self.rituel.exits = {"N": None, "E": None, "S": self.clouloir1, "O": self.stock1}
-        self.stock1.exits = {"N": self.safe, "E": self.rituel, "S": self.cave, "O": None}
-        self.clouloir1.exits = {"N": self.rituel, "E": self.prison, "S": None, "O": None}
-        self.prison.exits = {"N": None, "E": None, "S": None, "O": self.clouloir1}
-        self.sdb2.exits = {"N": None, "E": None, "S": self.ch2, "O": None}
-        self.ch2.exits = {"N": self.sdb2, "E": self.clouloir2, "S": None, "O": None}
-        self.clouloir2.exits = {"N": self.stock2, "E": self.balcon, "S": None, "O": self.ch2}
-        self.stock2.exits = {"N": None, "E": None, "S": self.clouloir2, "O": None}
-        self.bureau.exits = {"N": self.clouloir1, "E": None, "S": self.balcon, "O": None}
-        self.balcon.exits = {"N": self.bureau, "E": self.safe, "S": self.salon, "O": self.clouloir2}
-        self.safe.exits = {"N": None, "E": self.stock1, "S": None, "O": self.balcon}
-        self.cuisine.exits = {"N": self.cave, "E": self.sam, "S": None, "O": None}
-        self.sam.exits = {"N": None, "E": self.salon, "S": None, "O": self.cuisine}
-        self.salon.exits = {"N": self.balcon, "E": self.ch1, "S": None, "O": self.sam}
-        self.ch1.exits = {"N": None, "E": self.sdb1, "S": None, "O": self.salon}
-        self.sdb1.exits = {"N": None, "E": None, "S": None, "O": self.ch1}
+        self.cave.exits = {"N": self.stock1, "E": None, "S": None, "O": None, "U": self.cuisine, "D": None}
+        self.rituel.exits = {"N": None, "E": None, "S": self.clouloir1, "O": self.stock1, "U": None, "D": None}
+        self.stock1.exits = {"N": None, "E": self.rituel, "S": self.cave, "O": None, "U": self.safe, "D": None}
+        self.clouloir1.exits = {"N": self.rituel, "E": self.prison, "S": None, "O": None, "U": None, "D": None}
+        self.prison.exits = {"N": None, "E": None, "S": None, "O": self.clouloir1, "U": None, "D": None}
+        self.sdb2.exits = {"N": None, "E": None, "S": self.ch2, "O": None, "U": None, "D": None}
+        self.ch2.exits = {"N": self.sdb2, "E": self.clouloir2, "S": None, "O": None, "U": None, "D": None}
+        self.clouloir2.exits = {"N": self.stock2, "E": self.balcon, "S": None, "O": self.ch2, "U": None, "D": None}
+        self.stock2.exits = {"N": None, "E": None, "S": self.clouloir2, "O": None, "U": None, "D": None}
+        self.bureau.exits = {"N": None, "E": None, "S": self.balcon, "O": None, "U": None, "D": self.clouloir1}
+        self.balcon.exits = {"N": self.bureau, "E": self.safe, "S": None, "O": self.clouloir2, "U": None, "D": self.salon}
+        self.safe.exits = {"N": None, "E": None, "S": None, "O": self.balcon, "U": None, "D": self.stock1}
+        self.cuisine.exits = {"N": None, "E": self.sam, "S": None, "O": None, "U": None, "D": self.cave}
+        self.sam.exits = {"N": None, "E": self.salon, "S": None, "O": self.cuisine, "U": None, "D": None}
+        self.salon.exits = {"N": None, "E": self.ch1, "S": None, "O": self.sam, "U": self.balcon, "D": None}
+        self.ch1.exits = {"N": None, "E": self.sdb1, "S": None, "O": self.salon, "U": None, "D": None}
+        self.sdb1.exits = {"N": None, "E": None, "S": None, "O": self.ch1, "U": None, "D": None}
 
         # --- PLAYER ---
         self.player = Player(input("\nEntrez votre nom: "))
