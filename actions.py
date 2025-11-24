@@ -72,3 +72,44 @@ class Actions:
         
         print(game.player.get_history())
         return True
+    
+    @staticmethod
+    def action_back(game, list_of_words, number_of_parameters):
+        """Essaye de déplacer le joueur dans la direction pour aller dans la salle précédente"""
+        player = game.player
+        l = len(list_of_words)
+        
+        if l != number_of_parameters + 1:
+            print(MSG1.format(command_word=list_of_words[0]))
+            return False
+    
+        # Si pas de salle précédente (début du jeu)
+        if player.prev_room is None:
+            print("Impossible de reculer, vous êtes au début.")
+            return True
+
+        # On cherche quelle direction (N, E, S, O, U, D) mène à la prev_room
+        direction_to_go = None
+        
+        if player.prev_room == [] :
+            print("Vous ne pouvez pas plus revenir en arrière !")
+            return True
+
+        # On parcourt le dictionnaire exits de la salle ACTUELLE : {"N": RoomB, "S": None...}
+        for direction, room in player.current_room.exits.items():
+            if room == player.prev_room[-1]:
+                direction_to_go = direction
+                break # On a trouvé la direction, on arrête de chercher
+        
+        
+        player.prev_room.remove(player.prev_room[-1])
+
+        # Si on a trouvé une direction qui mène à l'ancienne salle
+        if direction_to_go is not None:
+            player.move(direction_to_go)
+            player.prev_room.remove(player.prev_room[-1])
+        else:
+            # Cas où c'est un sens unique
+            print("Il n'y a pas de passage pour retourner en arrière.")
+
+        return True

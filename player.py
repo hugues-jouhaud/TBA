@@ -12,7 +12,7 @@ class Player:
         self.current_room = None
         self.hp = 2 # Le joueur début avec deux PV.
         self.room_history = []
-        self.prev_room = None
+        self.prev_room = []
     
     # Define the move method.
 
@@ -43,12 +43,12 @@ class Player:
         # Ajout de la description de la pièce actuelle à l'historique AVANT de bouger
         if self.current_room.description not in self.room_history:
             self.room_history.append(self.current_room.description)
-        self.prev_room = self.current_room.name
+        self.prev_room.append(self.current_room)
 
 
         self.current_room = next_room
         print(self.current_room.get_long_description())
-        print(self.prev_room)
+        print(self.get_history())
         return True
 
     def get_history(self):
