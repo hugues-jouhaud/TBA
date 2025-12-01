@@ -2,8 +2,8 @@ from room import Room
 from player import Player
 from actions import Actions
 from command import Command
-from character import Character
-
+from item import Item, Pile 
+from character import Character 
 import time
 import random
 
@@ -17,18 +17,20 @@ class Game:
         self.debug = True
         self.qte_count = 0
     
-    # Setup the game
     def setup(self):
         # --- COMMANDES ---
         self.commands["help"] = Command("help", " : afficher cette aide", Actions.help, 0)
         self.commands["quit"] = Command("quit", " : quitter le jeu", Actions.quit, 0)
-        self.commands["go"] = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O)", Actions.go, 1)
-        self.commands["inv"] = Command("inv", " : Affiche l’inventaire du joueur", Actions.action_inv, 0)
-        self.commands["history"] = Command("history", " : Affiche les pièces déjà visitées", Actions.action_history, 0)
-        self.commands["back"] = Command("back", " : se déplace dans la salle précédente", Actions.action_back, 0)
+        self.commands["go"] = Command("go", " <direction> : se déplacer (N, E, S, O, U, D)", Actions.go, 1)
+        self.commands["check"] = Command("check", " : Affiche l’inventaire", Actions.action_check, 0) 
+        self.commands["history"] = Command("history", " : Historique des pièces", Actions.action_history, 0)
+        self.commands["back"] = Command("back", " : Retour arrière", Actions.action_back, 0)
+        self.commands["look"] = Command("look", " : voir les objets", Actions.action_look, 0) 
+        self.commands["take"] = Command("take", " <item> : prendre un objet", Actions.action_take, 1) 
+        self.commands["drop"] = Command("drop", " <item> : jeter un objet", Actions.action_drop, 1)
         self.commands["talk"] = Command("talk", " : parler au personnage x qui se trouve dans la salle.", Actions.action_talk, 1)
 
-        # --- SALLES ---
+        # --- SALLES (VOTRE CARTE) ---
         self.cave = Room("cave", "dans une cave sombre et humide")
         self.rituel = Room("salle de Rituel", "dans une pièce étrange avec des symboles au sol")
         self.stock1 = Room("stockage 1", "dans un débarras encombré")
@@ -55,32 +57,44 @@ class Game:
         ])
 
         # --- EXITS ---
-        self.cave.exits = {"N": self.stock1, "E": None, "S": None, "O": None, "U": self.cuisine, "D": None}
-        self.rituel.exits = {"N": None, "E": None, "S": self.clouloir1, "O": self.stock1, "U": None, "D": None}
-        self.stock1.exits = {"N": None, "E": self.rituel, "S": self.cave, "O": None, "U": self.safe, "D": None}
-        self.clouloir1.exits = {"N": self.rituel, "E": self.prison, "S": None, "O": None, "U": None, "D": None}
-        self.prison.exits = {"N": None, "E": None, "S": None, "O": self.clouloir1, "U": None, "D": None}
-        self.sdb2.exits = {"N": None, "E": None, "S": self.ch2, "O": None, "U": None, "D": None}
-        self.ch2.exits = {"N": self.sdb2, "E": self.clouloir2, "S": None, "O": None, "U": None, "D": None}
-        self.clouloir2.exits = {"N": self.stock2, "E": self.balcon, "S": None, "O": self.ch2, "U": None, "D": None}
-        self.stock2.exits = {"N": None, "E": None, "S": self.clouloir2, "O": None, "U": None, "D": None}
-        self.bureau.exits = {"N": None, "E": None, "S": self.balcon, "O": None, "U": None, "D": self.clouloir1}
-        self.balcon.exits = {"N": self.bureau, "E": self.safe, "S": None, "O": self.clouloir2, "U": None, "D": self.salon}
-        self.safe.exits = {"N": None, "E": None, "S": None, "O": self.balcon, "U": None, "D": self.stock1}
-        self.cuisine.exits = {"N": None, "E": self.sam, "S": None, "O": None, "U": None, "D": self.cave}
-        self.sam.exits = {"N": None, "E": self.salon, "S": None, "O": self.cuisine, "U": None, "D": None}
-        self.salon.exits = {"N": None, "E": self.ch1, "S": None, "O": self.sam, "U": self.balcon, "D": None}
-        self.ch1.exits = {"N": None, "E": self.sdb1, "S": None, "O": self.salon, "U": None, "D": None}
-        self.sdb1.exits = {"N": None, "E": None, "S": None, "O": self.ch1, "U": None, "D": None}
+        self.cave.exits = {"N": self.stock1, "U": self.cuisine}
+        self.rituel.exits = {"S": self.clouloir1, "O": self.stock1}
+        self.stock1.exits = {"E": self.rituel, "S": self.cave, "U": self.safe}
+        self.clouloir1.exits = {"N": self.rituel, "E": self.prison}
+        self.prison.exits = {"O": self.clouloir1}
+        self.sdb2.exits = {"S": self.ch2}
+        self.ch2.exits = {"N": self.sdb2, "E": self.clouloir2}
+        self.clouloir2.exits = {"N": self.stock2, "E": self.balcon, "O": self.ch2}
+        self.stock2.exits = {"S": self.clouloir2}
+        self.bureau.exits = {"S": self.balcon, "D": self.clouloir1}
+        self.balcon.exits = {"N": self.bureau, "E": self.safe, "O": self.clouloir2, "D": self.salon}
+        self.safe.exits = {"O": self.balcon, "D": self.stock1}
+        self.cuisine.exits = {"E": self.sam, "D": self.cave}
+        self.sam.exits = {"E": self.salon, "O": self.cuisine}
+        self.salon.exits = {"E": self.ch1, "O": self.sam, "U": self.balcon}
+        self.ch1.exits = {"E": self.sdb1, "O": self.salon}
+        self.sdb1.exits = {"O": self.ch1}
 
-        # --- PLAYER ---
+        # --- ITEMS (AJOUT DU SYSTÈME D'OBJETS) ---
+        sword = Item("sword", "une épée tranchante", 2.0)
+        shield = Item("shield", "un bouclier", 1.5)
+        potion = Item("potion", "une potion rouge", 0.5)
+        pile = Pile() # Item spécial
+
+        # Placement des items
+        self.stock1.add_item(sword, 1)
+        self.safe.add_item(shield, 1)
+        self.cuisine.add_item(potion, 2)
+        self.rituel.add_item(pile, 1)
+
+        # --- JOUEUR ---
         self.player = Player(input("\nEntrez votre nom: "))
-        self.player.current_room = self.salon
+        self.player.set_room(self.salon)
 
-    # --- BOUCLE DE JEU ---
     def play(self):
         self.setup()
         self.print_welcome()
+        
         while not self.finished:
             # --- DEBUG ---
             if self.debug and self.character and self.character.current_room:
@@ -90,19 +104,21 @@ class Game:
             # --- Déplacement du joueur ---
             # Get the command from the player
             user_input = input("> ")
-            if not user_input:
-                continue
-            words = user_input.split() 
-            if not words:
-                continue
+            if not user_input: continue
             
-
-            if self.finished:
-                break
-
-            # --- LOGIQUE DU MONSTRE ---
-            # Le monstre bouge SEULEMENT si la commande est "go"
+            # --- LOGIQUE DU MONSTRE (Déplacement) ---
             monster_intercepted = False
+            words = user_input.split()
+            if words:
+                command_word = words[0]
+                # Le monstre bouge si le joueur bouge
+                if self.character is not None and command_word in ["go", "back"]:
+                    etais_stun = self.character.stunned_turns > 0
+                    self.character.move()
+                    # Interception (Le monstre arrive sur le joueur)
+                    if self.character.current_room == self.player.current_room and not etais_stun:
+                        monster_intercepted = True
+                        self.trigger_qte()
 
             words = user_input.split()     # <-- On coupe la phrase
             command_word = words[0]        # <-- On prend le 1er mot
@@ -132,8 +148,7 @@ class Game:
                     if self.character.stunned_turns == 0:
                         self.trigger_qte()
             
-            if self.finished:
-                break
+            if self.finished: break
 
             # --- GESTION DU SPAWN ---
             if self.character is None:
@@ -148,8 +163,6 @@ class Game:
                     distance = self.character.distance_du_joueur(self.player.current_room)
                     if distance == 1:
                         print("\n--> Vous entendez des bruits de pas tout proches...")
-                    elif distance == 2:
-                        print("\n--> Un grognement résonne au loin.")
 
     def spawn_monster(self):
         self.character = Character()
@@ -198,24 +211,18 @@ class Game:
             return False
 
     def process_command(self, command_string):
-        if not command_string:
-            return
+        if not command_string: return
         list_of_words = command_string.split()
         command_word = list_of_words[0]
-
         if command_word in self.commands:
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)
         else:
-            print(f"\nCommande '{command_word}' non reconnue. Entrez 'help' pour voir la liste des commandes disponibles.\n")
+            print(f"\nCommande '{command_word}' non reconnue.")
 
     def print_welcome(self):
-        print(f"\nBienvenue {self.player.name} dans ce jeu d'aventure !")
-        print("Entrez 'help' si vous avez besoin d'aide.")
+        print(f"\nBienvenue {self.player.name} !")
         print(self.player.current_room.get_long_description())
 
-def main():
-    Game().play()
-
 if __name__ == "__main__":
-    main()
+    Game().play()
