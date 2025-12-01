@@ -116,7 +116,25 @@ class Game:
                         monster_intercepted = True
                         self.trigger_qte()
 
-            # --- TRAITEMENT COMMANDE ---
+            words = user_input.split()     # <-- On coupe la phrase
+            command_word = words[0]        # <-- On prend le 1er mot
+            
+            if self.npc is not None and (command_word == "go" or command_word == "back"):
+
+                # Mob stun ?
+                etais_stun = self.npc.stunned_turns > 0
+
+                # Le monstre bouge
+                self.npc.move()
+                
+                # S'il arrive sur nous (Interception)
+                if self.npc.current_room == self.player.current_room and not etais_stun:
+                    monster_intercepted = True
+                    self.trigger_qte()
+
+            # --- TRAITEMENT DE LA COMMANDE ---
+            # On ne bouge pas si on s'est fait intercepter
+            # Sinon :
             if not monster_intercepted:
                 self.process_command(user_input)
                 # Rencontre (Le joueur arrive sur le monstre)
