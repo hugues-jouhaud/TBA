@@ -49,7 +49,9 @@ class Actions:
             print(MSG0.format(command_word=list_of_words[0]))
             return False
         result = game.player.current_room.get_look_item_display()
-        print(result)
+
+        resultCharacter = game.character.curre
+        print(result, )
         if result == "Il n'y a rien ici.":
             print() 
         return True
