@@ -58,9 +58,13 @@ class Actions:
     @staticmethod
     def action_inv(game, list_of_words, number_of_parameters):
         """Afficher l’inventaire du joueur."""
-        print("\nInventaire du joueur :")
-        # Utilise la méthode show() de Inventory
-        game.player.inventory.show()
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            print(MSG0.format(command_word=list_of_words[0]))
+            return False
+        
+        # ATTENTION : Modification pour utiliser la méthode get_inventory() du Player
+        print(game.player.get_inventory())
         print()
         return True
     @staticmethod

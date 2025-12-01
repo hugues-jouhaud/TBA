@@ -24,6 +24,15 @@ class Player:
             print(f"Vous avez obtenu {amount} x {item.name}.")
         else:
             print("Votre inventaire est plein !")
+            
+    # ATTENTION : Ajout de la méthode get_inventory()
+    def get_inventory(self):
+        """
+        Retourne la représentation textuelle de l'inventaire.
+        Délègue l'affichage à la classe Inventory.
+        """
+        # Appelle la méthode d'affichage dans Inventory
+        return self.inventory.get_inventory_display()
 
     def move(self, direction):
         """
