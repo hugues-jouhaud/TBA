@@ -1,7 +1,7 @@
 #Import modules :
 import random
 
-class Monstre:
+class Character:
     """
     Représente un monstre (NPC) qui se déplace dans le jeu.
     Il peut se dépalcer et calculer sa distance au joueur.
@@ -14,6 +14,15 @@ class Monstre:
         """
         self.current_room = None  # La salle actuelle
         self.stunned_turns = 0 # Compteur des tours stun restant
+        self.name = "Monstre"
+        self.description = "Un monstre hideux"
+        self.msgs = "Grrrrr"
+    
+    def __str__(self):
+        """
+        Nom du monstre.
+        """
+        return self.name + " : " + self.description
     
     def distance_du_joueur(self, player_room):
         """

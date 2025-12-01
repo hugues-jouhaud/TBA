@@ -2,7 +2,7 @@ from room import Room
 from player import Player
 from actions import Actions
 from command import Command
-from npc import Monstre
+from character import Character
 
 import time
 import random
@@ -13,7 +13,7 @@ class Game:
         self.rooms = []
         self.commands = {}
         self.player = None
-        self.npc = None
+        self.character = None
         self.debug = True
         self.qte_count = 0
     
@@ -26,6 +26,7 @@ class Game:
         self.commands["inv"] = Command("inv", " : Affiche l’inventaire du joueur", Actions.action_inv, 0)
         self.commands["history"] = Command("history", " : Affiche les pièces déjà visitées", Actions.action_history, 0)
         self.commands["back"] = Command("back", " : se déplace dans la salle précédente", Actions.action_back, 0)
+        self.commands["talk"] = Command("talk", " : parler au personnage x qui se trouve dans la salle.", Actions.action_talk, 1)
 
         # --- SALLES ---
         self.cave = Room("cave", "dans une cave sombre et humide")
@@ -82,8 +83,10 @@ class Game:
         self.print_welcome()
         while not self.finished:
             # --- DEBUG ---
-            if self.debug and self.npc:
-                print(f"[DEBUG] Monstre: {self.npc.current_room.name} (Stun: {self.npc.stunned_turns})")
+            if self.debug and self.character and self.character.current_room:
+                print(f"[DEBUG] Monstre: {self.character.current_room.name} (Stun: {self.character.stunned_turns})")
+            elif self.debug and self.character:
+                print(f"[DEBUG] Monstre: <aucune salle> (Stun: {self.character.stunned_turns})")
             # --- Déplacement du joueur ---
             # Get the command from the player
             user_input = input("> ")
@@ -104,16 +107,16 @@ class Game:
             words = user_input.split()     # <-- On coupe la phrase
             command_word = words[0]        # <-- On prend le 1er mot
             
-            if self.npc is not None and (command_word == "go" or command_word == "back"):
+            if self.character is not None and (command_word == "go" or command_word == "back"):
 
                 # Mob stun ?
-                etais_stun = self.npc.stunned_turns > 0
+                etais_stun = self.character.stunned_turns > 0
 
                 # Le monstre bouge
-                self.npc.move()
+                self.character.move()
                 
                 # S'il arrive sur nous (Interception)
-                if self.npc.current_room == self.player.current_room and not etais_stun:
+                if self.character.current_room == self.player.current_room and not etais_stun:
                     monster_intercepted = True
                     self.trigger_qte()
 
@@ -124,36 +127,36 @@ class Game:
                 self.process_command(user_input)
 
                 # On vient de bouger, on vérifie si on est tombé nez à nez avec le monstre
-                if self.npc is not None and self.npc.current_room == self.player.current_room:
+                if self.character is not None and self.character.current_room == self.player.current_room:
                     # On vérifie s'il est stun (car s'il dort, pas de QTE)
-                    if self.npc.stunned_turns == 0:
+                    if self.character.stunned_turns == 0:
                         self.trigger_qte()
             
             if self.finished:
                 break
 
             # --- GESTION DU SPAWN ---
-            if self.npc is None:
+            if self.character is None:
                 if self.player.current_room == self.rituel:
                     self.spawn_monster()
             
             # --- MESSAGES D'AMBIANCE (Distance) ---
             # On vérifie la distance APRÈS tous les mouvements
-            elif self.npc is not None:
+            elif self.character is not None:
                 # Si on ne s'est pas fait attaquer ce tour-ci, on donne des indices
-                if self.npc.current_room != self.player.current_room:
-                    distance = self.npc.distance_du_joueur(self.player.current_room)
+                if self.character.current_room != self.player.current_room:
+                    distance = self.character.distance_du_joueur(self.player.current_room)
                     if distance == 1:
                         print("\n--> Vous entendez des bruits de pas tout proches...")
                     elif distance == 2:
                         print("\n--> Un grognement résonne au loin.")
 
     def spawn_monster(self):
-        self.npc = Monstre()
-        self.npc.current_room = self.salon
+        self.character = Character()
+        self.character.current_room = self.salon
         print("\n-----------------------------------------------------")
         print("Un rugissement glacial secoue le manoir...")
-        print(f"Vous avez réveillé un monstre ! Il est dans le {self.npc.current_room.name}.")
+        print(f"Vous avez réveillé un monstre ! Il est dans le {self.character.current_room.name}.")
         print("-----------------------------------------------------\n")
 
     def trigger_qte(self):
@@ -177,7 +180,7 @@ class Game:
         if user_input == target_word and duration <= 5.0:
             print(f"\nSUCCÈS ! (Temps: {round(duration, 2)}s)")
             print("Vous repoussez le monstre ! Il est étourdi pour 3 tours.")
-            self.npc.stunned_turns = 3 
+            self.character.stunned_turns = 3 
             self.qte_count += 1        
             return True
             

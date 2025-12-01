@@ -117,3 +117,35 @@ class Actions:
             print("Il n'y a pas de passage pour retourner en arrière.")
 
         return True
+    
+    @staticmethod
+    def action_talk(game, list_of_words, number_of_parameters) :
+        """ Parler au npc x """
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            print(MSG0.format(command_word=list_of_words[0]))
+            return False
+
+        character = game.character
+        player = game.player
+
+        # Pas de personnage disponible
+        if character is None:
+            print("Aucun personnage n'est présent pour parler.")
+            return True
+
+        nom = list_of_words[1]
+        # Comparaison basique du nom (sensible à la casse pour l'instant)
+        if nom != character.name:
+            print("Ce personnage n'existe pas")
+            return True
+
+        # Vérifier qu'on a bien des salles avant d'y accéder
+        if character.current_room is not None and player is not None and character.current_room == player.current_room:
+            print(character.msgs)
+            return True
+
+        print("Ce personnage n'est pas dans la salle")
+        return True
+
+        
