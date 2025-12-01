@@ -104,7 +104,7 @@ class Game:
             words = user_input.split()     # <-- On coupe la phrase
             command_word = words[0]        # <-- On prend le 1er mot
             
-            if self.npc is not None and command_word == "go":
+            if self.npc is not None and (command_word == "go" or command_word == "back"):
 
                 # Mob stun ?
                 etais_stun = self.npc.stunned_turns > 0
