@@ -29,7 +29,7 @@ class Command:
 
     """
 
-    # The constructor.
+# The constructor.
     def __init__(self, command_word, help_string, action, number_of_parameters):
         self.command_word = command_word
         self.help_string = help_string

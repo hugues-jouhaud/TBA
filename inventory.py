@@ -1,5 +1,5 @@
 # inventory.py — Inventaire du joueur
-from item import Item # Ajout de l'import pour la clarté et l'accès à Item.name/max_stack
+from item import Item 
 
 class InventorySlot:
     """Case d’inventaire contenant un objet + quantité."""
@@ -16,7 +16,6 @@ class Inventory:
 
     def add_item(self, item, amount=1):
         """Ajoute un item en gérant les stacks."""
-
         # Empiler si stack déjà existant
         for slot in self.slots:
             if slot and slot.item.name == item.name and slot.quantity < item.max_stack:
@@ -35,31 +34,22 @@ class Inventory:
                 amount -= to_add
                 if amount <= 0:
                     return True
+        return False
 
-        return False  # Inventaire plein
-
-    # ATTENTION : Méthode modifiée pour correspondre au format d'affichage requis.
-    def get_inventory_display(self):
-        """
-        Produit la chaîne de caractères représentant l'inventaire du joueur.
-        Format : 'Votre inventaire est vide.' ou 'Vous disposez des items suivants : ...'
-        """
+    def get_inventory_display(self): 
+        """Produit la chaîne de caractères représentant l'inventaire."""
         item_list_strings = []
-        
-        # Consolidation des items uniques (si plusieurs stacks du même item)
-        # Mais pour la consigne, il faut afficher chaque slot utilisé
-        
         for slot in self.slots:
             if slot:
-                # Utilise la méthode __str__ de l'Item
-                item_str = f"{slot.item.__str__()} x{slot.quantity}"
+                item_str = slot.item.__str__()
+                if slot.quantity > 1:
+                    item_str += f" x{slot.quantity}"
                 item_list_strings.append(item_str)
         
         if not item_list_strings:
             return "Votre inventaire est vide."
         
-        output = "Vous disposez des items suivants :"
+        output = "Vous disposez des items suivants:"
         for item_str in item_list_strings:
-            output += f"\n    - {item_str}"
-            
+            output += f"\n        - {item_str}"
         return output
