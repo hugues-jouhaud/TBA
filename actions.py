@@ -120,6 +120,7 @@ class Actions:
         item_to_drop = player.remove_item(item_name, amount) 
         if item_to_drop:
             current_room.add_item(item_to_drop, amount)
+            print("vous avez posé un(e):",item_to_drop)
             return True
         else:
             return False
