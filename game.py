@@ -3,7 +3,8 @@ from player import Player
 from actions import Actions
 from command import Command
 from item import Item, Pile 
-from character import Character 
+from character import Character
+from quest import Quest
 import time
 import random
 
@@ -29,6 +30,11 @@ class Game:
         self.commands["take"] = Command("take", " <item> : prendre un objet", Actions.action_take, 1) 
         self.commands["drop"] = Command("drop", " <item> : jeter un objet", Actions.action_drop, 1)
         self.commands["talk"] = Command("talk", " : parler au personnage x qui se trouve dans la salle.", Actions.action_talk, 1)
+        # commandes quêtes :
+        self.commands["quests"] = Command("quests", " : afficher la liste des quêtes", Actions.quests, 0)
+        self.commands["quest"] = Command("quest", " <titre> : afficher les détails d'une quête", Actions.quest, 1)
+        self.commands["activate"] = Command("activate", " <titre> : activer une quête", Actions.activate, 1)
+        self.commands["rewards"] = Command("rewards", " : afficher vos récompenses", Actions.rewards, 0)
 
         # --- SALLES (VOTRE CARTE) ---
         self.cave = Room("cave", "dans une cave sombre et humide")
@@ -125,6 +131,44 @@ class Game:
         # --- JOUEUR ---
         self.player = Player(input("\nEntrez votre nom: "))
         self.player.set_room(self.salon)
+
+
+        # --- Quêtes ---
+        self._setup_quests()
+    
+    def _setup_quests(self):
+        """Initialize all quests."""
+        exploration_quest = Quest(
+            title="Grand Explorateur",
+            description="Explorez tous les lieux de ce monde mystérieux.",
+            objectives=["Visiter Forest"
+                        , "Visiter Tower"
+                        , "Visiter Cave"
+                        , "Visiter Cottage"
+                        , "Visiter Castle"],
+            reward="Titre de Grand Explorateur"
+        )
+
+        travel_quest = Quest(
+            title="Grand Voyageur",
+            description="Déplacez-vous 10 fois entre les lieux.",
+            objectives=["Se déplacer 10 fois"],
+            reward="Bottes de voyageur"
+        )
+
+        discovery_quest = Quest(
+            title="Découvreur de Secrets",
+            description="Découvrez les trois lieux les plus mystérieux.",
+            objectives=["Visiter Cave"
+                        , "Visiter Tower"
+                        , "Visiter Castle"],
+            reward="Clé dorée"
+        )
+
+        # Add quests to player's quest manager
+        self.player.quest_manager.add_quest(exploration_quest)
+        self.player.quest_manager.add_quest(travel_quest)
+        self.player.quest_manager.add_quest(discovery_quest)
 
     def play(self):
         self.setup()

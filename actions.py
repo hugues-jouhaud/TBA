@@ -155,4 +155,67 @@ class Actions:
         print("Ce personnage n'est pas dans la salle")
         return True
 
+    # --- NOUVELLES ACTIONS POUR LES QUÊTES ---
+
+    @staticmethod
+    def quests(game, list_of_words, number_of_parameters):
+        """Show all quests and their status."""
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            print(MSG0.format(command_word=list_of_words[0]))
+            return False
         
+        game.player.quest_manager.show_quests()
+        return True
+
+    @staticmethod
+    def quest(game, list_of_words, number_of_parameters):
+        """Show details about a specific quest."""
+        l = len(list_of_words)
+        if l < number_of_parameters + 1:
+            print(MSG1.format(command_word=list_of_words[0]))
+            return False
+
+        # Get the quest title from the list of words (join all words after command)
+        quest_title = " ".join(list_of_words[1:])
+
+        # Prepare current counter values to show progress
+        current_counts = {
+            "Se déplacer": game.player.move_count
+        }
+
+        # Show quest details
+        game.player.quest_manager.show_quest_details(quest_title, current_counts)
+        return True
+
+    @staticmethod
+    def activate(game, list_of_words, number_of_parameters):
+        """Activate a specific quest."""
+        l = len(list_of_words)
+        if l < number_of_parameters + 1:
+            print(MSG1.format(command_word=list_of_words[0]))
+            return False
+
+        # Get the quest title from the list of words (join all words after command)
+        quest_title = " ".join(list_of_words[1:])
+
+        # Try to activate the quest
+        if game.player.quest_manager.activate_quest(quest_title):
+            return True
+
+        msg1 = f"\nImpossible d'activer la quête '{quest_title}'. "
+        msg2 = "Vérifiez le nom ou si elle n'est pas déjà active.\n"
+        print(msg1 + msg2)
+        return False
+
+    @staticmethod
+    def rewards(game, list_of_words, number_of_parameters):
+        """Display all rewards earned by the player."""
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            print(MSG0.format(command_word=list_of_words[0]))
+            return False
+
+        # Show all rewards
+        game.player.show_rewards()
+        return True

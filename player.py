@@ -1,5 +1,6 @@
 # player.py
 from inventory import Inventory
+from quest import QuestManager  # <-- Ajout de l'import
 
 class Player:
     """Représente le joueur."""
@@ -10,7 +11,13 @@ class Player:
         self.current_room = None
         self.hp = 2
         self.room_history = []
-        self.prev_room = [] 
+        self.prev_room = []
+        
+        # --- AJOUT QUÊTES ---
+        self.move_count = 0
+        self.quest_manager = QuestManager(self)
+        self.rewards = []  # List to store earned rewards
+        # --------------------
     
     def set_room(self, room):
         self.current_room = room
@@ -62,6 +69,16 @@ class Player:
         self.current_room = next_room
         print(self.current_room.get_long_description())
         print(self.get_history())
+
+        # --- AJOUT QUÊTES ---
+        # Vérification des objectifs de visite (Check room visit objectives)
+        self.quest_manager.check_room_objectives(self.current_room.name)
+
+        # Incrément du compteur de mouvement et vérification (Check movement objectives)
+        self.move_count += 1
+        self.quest_manager.check_counter_objectives("Se déplacer", self.move_count)
+        # --------------------
+
         return True # Retourne True pour que le jeu sache qu'on a bougé (et active le monstre)
 
     def get_history(self):
@@ -72,3 +89,25 @@ class Player:
             description_cleaned = description.split(".")[0].replace("dans ", "").strip()
             history_string += f"\n        - {description_cleaned}"
         return history_string
+
+    # --- AJOUT MÉTHODES QUÊTES ---
+
+    def add_reward(self, reward):
+        """
+        Add a reward to the player's rewards list.
+        """
+        if reward and reward not in self.rewards:
+            self.rewards.append(reward)
+            print(f"\n🎁 Vous avez obtenu: {reward}\n")
+
+    def show_rewards(self):
+        """
+        Display all rewards earned by the player.
+        """
+        if not self.rewards:
+            print("\n🎁 Aucune récompense obtenue pour le moment.\n")
+        else:
+            print("\n🎁 Vos récompenses:")
+            for reward in self.rewards:
+                print(f"  • {reward}")
+            print()
