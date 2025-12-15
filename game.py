@@ -76,33 +76,51 @@ class Game:
         self.sdb1.exits = {"O": self.ch1}
 
         # --- ITEMS (AJOUT DU SYSTÈME D'OBJETS) ---
-        sword = Item("sword", "une épée tranchante", 2.0)
-        shield = Item("shield", "un bouclier", 1.5)
-        potion = Item("potion", "une potion rouge", 0.5)
         baterie_charge = Item("baterie", "une baterie chargée", 2.0)
         baterie_decharge = Item("baterie", "une baterie chargée", 2.0)
+        livre = Item("livre", "un des 5 tomes de l'encyclopédie", 0.2)
+        lampe = Item("Lampe Torche", "permet de s'éclairer dans le noir", 0.1)
 
         # Placement des items
-        self.stock1.add_item(sword, 1)
-        self.safe.add_item(shield, 1)
-        self.cuisine.add_item(potion, 2)
         self.cave.add_item(baterie_charge, 1)
+
         self.rituel.add_item(baterie_charge, 1)
+
         self.stock1.add_item(baterie_charge, 1)
+
         self.clouloir1.add_item(baterie_charge, 1)
+
         self.prison.add_item(baterie_charge, 1)
+
         self.sdb2.add_item(baterie_charge, 1)
+
         self.ch2.add_item(baterie_charge, 1)
+        self.ch2.add_item(livre, 1)
+
         self.clouloir2.add_item(baterie_charge, 1)
+
         self.stock2.add_item(baterie_charge, 1)
+        self.stock2.add_item(livre, 1)
+
         self.bureau.add_item(baterie_charge, 1)
+
         self.balcon.add_item(baterie_charge, 1)
+
         self.safe.add_item(baterie_charge, 1)
+        self.safe.add_item(livre, 1)
+        self.safe.add_item(lampe, 1)
+
         self.cuisine.add_item(baterie_charge, 1)
+        self.cuisine.add_item(livre, 1)
+
         self.sam.add_item(baterie_charge, 1)
+
         self.salon.add_item(baterie_charge, 1)
+
         self.ch1.add_item(baterie_charge, 1)
+
         self.sdb1.add_item(baterie_charge, 1)
+        self.sdb1.add_item(livre, 1)
 
         # --- JOUEUR ---
         self.player = Player(input("\nEntrez votre nom: "))
