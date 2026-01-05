@@ -180,48 +180,43 @@ class Game:
                 print(f"[DEBUG] Monstre: {self.character.current_room.name} (Stun: {self.character.stunned_turns})")
             elif self.debug and self.character:
                 print(f"[DEBUG] Monstre: <aucune salle> (Stun: {self.character.stunned_turns})")
-            # --- Déplacement du joueur ---
-            # Get the command from the player
+            
+            # --- Input du joueur ---
             user_input = input("> ")
             if not user_input: continue
             
+            words = user_input.split()
+            if not words: continue
+            
+            command_word = words[0]
+            
             # --- LOGIQUE DU MONSTRE (Déplacement) ---
             monster_intercepted = False
-            words = user_input.split()
-            if words:
-                command_word = words[0]
-                # Le monstre bouge si le joueur bouge
-                if self.character is not None and command_word in ["go", "back"]:
-                    etais_stun = self.character.stunned_turns > 0
-                    self.character.move()
-                    # Interception (Le monstre arrive sur le joueur)
-                    if self.character.current_room == self.player.current_room and not etais_stun:
-                        monster_intercepted = True
-                        self.trigger_qte()
-
-            words = user_input.split()     # <-- On coupe la phrase
-            command_word = words[0]        # <-- On prend le 1er mot
             
-            if self.character is not None and (command_word == "go" or command_word == "back"):
-
-                # Mob stun ?
-                etais_stun = self.character.stunned_turns > 0
-
-                # Le monstre bouge
-                self.character.move()
+            # Le monstre bouge SEULEMENT si le joueur fait une commande de mouvement ("go" ou "back")
+            if self.character is not None and command_word in ["go", "back"]:
                 
-                # S'il arrive sur nous (Interception)
+                etais_stun = self.character.stunned_turns > 0
+                
+                # --- CORRECTION ICI : On passe la salle du joueur ---
+                self.character.move(self.player.current_room)
+                
+                # Interception (Le monstre arrive sur le joueur pendant son tour)
                 if self.character.current_room == self.player.current_room and not etais_stun:
                     monster_intercepted = True
-                    self.trigger_qte()
+                    # Si le QTE échoue, on peut mourir ici, donc on check finished
+                    if not self.trigger_qte():
+                        # Si le joueur meurt pendant le QTE, on arrête la boucle
+                        if self.player.hp <= 0:
+                            self.finished = True
+                            break
 
             # --- TRAITEMENT DE LA COMMANDE ---
-            # On ne bouge pas si on s'est fait intercepter
-            # Sinon :
+            # On ne bouge pas si on s'est fait intercepter avant même de bouger
             if not monster_intercepted:
                 self.process_command(user_input)
 
-                # On vient de bouger, on vérifie si on est tombé nez à nez avec le monstre
+                # Après que le JOUEUR ait bougé, on vérifie s'il est tombé sur le monstre
                 if self.character is not None and self.character.current_room == self.player.current_room:
                     # On vérifie s'il est stun (car s'il dort, pas de QTE)
                     if self.character.stunned_turns == 0:
@@ -237,12 +232,15 @@ class Game:
             # --- MESSAGES D'AMBIANCE (Distance) ---
             # On vérifie la distance APRÈS tous les mouvements
             elif self.character is not None:
-                # Si on ne s'est pas fait attaquer ce tour-ci, on donne des indices
-                if self.character.current_room != self.player.current_room:
+                # Si on ne s'est pas fait attaquer ce tour-ci et qu'on n'est pas mort
+                if self.character.current_room != self.player.current_room and not self.finished:
+                    # --- CORRECTION ICI : On utilise aussi self.player.current_room ---
                     distance = self.character.distance_du_joueur(self.player.current_room)
                     if distance == 1:
                         print("\n--> Vous entendez des bruits de pas tout proches...")
-
+                    elif distance == 2:
+                        print("\n--> Une odeur putride flotte dans l'air...")
+    
     def spawn_monster(self):
         self.character = Character()
         self.character.current_room = self.salon
