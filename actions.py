@@ -99,6 +99,10 @@ class Actions:
         item_taken = current_room.take_item(item_name)
         if item_taken:
             if player.add_item(item_taken):
+                # --- VÉRIFICATION QUÊTE ---
+                # Vérifier si on a pris une baterie
+                if item_taken.name.lower() == "baterie":
+                    player.quest_manager.check_action_objectives("Prendre", "baterie")
                 return True
             else:
                 current_room.add_item(item_taken)
@@ -121,6 +125,21 @@ class Actions:
         if item_to_drop:
             current_room.add_item(item_to_drop, amount)
             print("vous avez posé un(e):",item_to_drop)
+            
+            # --- VÉRIFICATION QUÊTE LIVRES ---
+            # Si on est dans le bureau et qu'on pose un livre
+            if current_room.name == "Bureau" and item_to_drop.name.lower() == "livre":
+                # Compter les livres dans le bureau
+                book_count = 0
+                for item_obj, quantity in current_room.items.items():
+                    if item_obj.name.lower() == "livre":
+                        book_count += quantity
+                
+                # Si on a 5 livres, compléter la quête et débloquer le chemin
+                if book_count >= 5:
+                    player.quest_manager.check_action_objectives("Déposer", "5 livres")
+                    game.unlock_secret_path()
+            
             return True
         else:
             return False

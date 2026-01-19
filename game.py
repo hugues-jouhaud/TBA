@@ -72,7 +72,7 @@ class Game:
         self.ch2.exits = {"N": self.sdb2, "E": self.clouloir2}
         self.clouloir2.exits = {"N": self.stock2, "E": self.balcon, "O": self.ch2}
         self.stock2.exits = {"S": self.clouloir2}
-        self.bureau.exits = {"S": self.balcon, "D": self.clouloir1}
+        self.bureau.exits = {"S": self.balcon}  # Pas de "D" initialement, débloquer après les 5 livres
         self.balcon.exits = {"N": self.bureau, "E": self.safe, "O": self.clouloir2, "D": self.salon}
         self.safe.exits = {"O": self.balcon, "D": self.stock1}
         self.cuisine.exits = {"E": self.sam, "D": self.cave}
@@ -132,43 +132,60 @@ class Game:
         self.player = Player(input("\nEntrez votre nom: "))
         self.player.set_room(self.salon)
 
-
         # --- Quêtes ---
         self._setup_quests()
     
     def _setup_quests(self):
         """Initialize all quests."""
-        exploration_quest = Quest(
+        grand_explorateur = Quest(
             title="Grand Explorateur",
-            description="Explorez tous les lieux de ce monde mystérieux.",
-            objectives=["Visiter Forest"
-                        , "Visiter Tower"
-                        , "Visiter Cave"
-                        , "Visiter Cottage"
-                        , "Visiter Castle"],
-            reward="Titre de Grand Explorateur"
+            description="Explorez tous les lieux de ce mystérieux manoir.",
+            objectives=["Visiter cave", "Visiter salle de Rituel", "Visiter Safe", "Visiter Cuisine"],
+            reward="Pile d'énergie"
         )
 
-        travel_quest = Quest(
+        un_bruit_etonnant = Quest(
+            title="Un bruit étonnant",
+            description="Allez à la salle de Rituel pour découvrir la source de ce bruit étrange.",
+            objectives=["Visiter salle de Rituel"],
+            reward="Pile d'énergie"
+        )
+
+        une_mauvaise_surprise = Quest(
+            title="Une mauvaise surprise",
+            description="Survivez à la rencontre avec le monstre en réussissant le QTE.",
+            objectives=["Réussir un QTE"],
+            reward="Pile d'énergie"
+        )
+
+        energie_cool = Quest(
+            title="L'énergie c'est cool",
+            description="Ramassez votre première pile pour alimenter vos objets.",
+            objectives=["Prendre baterie"],
+            reward="Pile d'énergie"
+        )
+
+        survival_quest = Quest(
             title="Grand Voyageur",
-            description="Déplacez-vous 10 fois entre les lieux.",
+            description="Déplacez-vous 10 fois dans le manoir.",
             objectives=["Se déplacer 10 fois"],
-            reward="Bottes de voyageur"
+            reward="Pile d'énergie"
         )
 
-        discovery_quest = Quest(
-            title="Découvreur de Secrets",
-            description="Découvrez les trois lieux les plus mystérieux.",
-            objectives=["Visiter Cave"
-                        , "Visiter Tower"
-                        , "Visiter Castle"],
-            reward="Clé dorée"
+        mysteres_manoir = Quest(
+            title="Les Mystères du Manoir",
+            description="Récupérez les 5 livres dispersés dans le manoir et déposez-les dans le bureau pour découvrir un secret.",
+            objectives=["Déposer 5 livres dans le bureau"],
+            reward="Pile d'énergie"
         )
 
         # Add quests to player's quest manager
-        self.player.quest_manager.add_quest(exploration_quest)
-        self.player.quest_manager.add_quest(travel_quest)
-        self.player.quest_manager.add_quest(discovery_quest)
+        self.player.quest_manager.add_quest(un_bruit_etonnant)
+        self.player.quest_manager.add_quest(une_mauvaise_surprise)
+        self.player.quest_manager.add_quest(energie_cool)
+        self.player.quest_manager.add_quest(grand_explorateur)
+        self.player.quest_manager.add_quest(survival_quest)
+        self.player.quest_manager.add_quest(mysteres_manoir)
 
     def play(self):
         self.setup()
@@ -209,6 +226,7 @@ class Game:
                         # Si le joueur meurt pendant le QTE, on arrête la boucle
                         if self.player.hp <= 0:
                             self.finished = True
+                            self.lose()
                             break
 
             # --- TRAITEMENT DE LA COMMANDE ---
@@ -220,7 +238,11 @@ class Game:
                 if self.character is not None and self.character.current_room == self.player.current_room:
                     # On vérifie s'il est stun (car s'il dort, pas de QTE)
                     if self.character.stunned_turns == 0:
-                        self.trigger_qte()
+                        if not self.trigger_qte():
+                            if self.player.hp <= 0:
+                                self.finished = True
+                                self.lose()
+                                break
             
             if self.finished: break
 
@@ -240,6 +262,9 @@ class Game:
                         print("\n--> Vous entendez des bruits de pas tout proches...")
                     elif distance == 2:
                         print("\n--> Une odeur putride flotte dans l'air...")
+            
+            # --- VÉRIFICATION DE LA VICTOIRE ---
+            self.check_win()
     
     def spawn_monster(self):
         self.character = Character()
@@ -271,7 +296,11 @@ class Game:
             print(f"\nSUCCÈS ! (Temps: {round(duration, 2)}s)")
             print("Vous repoussez le monstre ! Il est étourdi pour 3 tours.")
             self.character.stunned_turns = 3 
-            self.qte_count += 1        
+            self.qte_count += 1
+            
+            # Vérifier la quête "Une mauvaise surprise"
+            self.player.quest_manager.check_action_objectives("Réussir", "un QTE")
+            
             return True
             
         else:
@@ -300,6 +329,40 @@ class Game:
     def print_welcome(self):
         print(f"\nBienvenue {self.player.name} !")
         print(self.player.current_room.get_long_description())
+
+    def check_win(self):
+        """Vérifie si le joueur a gagné (toutes les quêtes complétées)."""
+        all_quests = self.player.quest_manager.get_all_quests()
+        if all_quests and all(quest.is_completed for quest in all_quests):
+            self.finished = True
+            self.win()
+
+    def win(self):
+        """Affiche le message de victoire."""
+        print("\n" + "="*50)
+        print("🎉 FÉLICITATIONS ! VOUS AVEZ GAGNÉ ! 🎉")
+        print("="*50)
+        print("\nVous avez accompli toutes les quêtes du manoir.")
+        print("Voici vos récompenses finales:")
+        self.player.show_rewards()
+        print("="*50 + "\n")
+
+    def lose(self):
+        """Affiche le message de défaite."""
+        print("\n" + "="*50)
+        print("💀 GAME OVER - VOUS AVEZ PERDU 💀")
+        print("="*50)
+        print("\nLe monstre vous a vaincu...")
+        print(f"Vous avez survécu à {self.qte_count} QTE(s).")
+        print("="*50 + "\n")
+
+    def unlock_secret_path(self):
+        """Déverrouille le chemin secret du bureau vers le couloir sombre."""
+        self.bureau.exits["D"] = self.clouloir1
+        print("\n" + "="*50)
+        print("✨ Un passage secret s'ouvre dans le bureau !")
+        print("Une porte vers le couloir sombre devient accessible...")
+        print("="*50 + "\n")
 
 if __name__ == "__main__":
     Game().play()

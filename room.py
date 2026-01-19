@@ -58,3 +58,7 @@ class Room:
 
     def get_long_description(self):
         return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}"
+    
+    def get_items_here(self):
+        """Retourne la liste des items actuellement dans la pièce."""
+        return self.items

@@ -94,10 +94,15 @@ class Player:
 
     def add_reward(self, reward):
         """
-        Add a reward to the player's rewards list.
+        Add a reward to the player's rewards list and inventory.
         """
         if reward and reward not in self.rewards:
             self.rewards.append(reward)
+            # Ajouter la pile d'énergie à l'inventaire
+            if "Pile" in reward:
+                from item import Pile
+                pile = Pile()
+                self.inventory.add_item(pile, 1)
             print(f"\n🎁 Vous avez obtenu: {reward}\n")
 
     def show_rewards(self):

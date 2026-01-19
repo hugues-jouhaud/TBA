@@ -291,32 +291,24 @@ class Quest:
             
         Returns:
             bool: True if an objective was completed, False otherwise.
-            
-        Examples:
-        
-        >>> quest = Quest("Talk", "Have a conversation", ["parler avec garde"])
-        >>> quest.check_action_objective("parler", "garde") # doctest: +NORMALIZE_WHITESPACE
-        ✅ Objectif accompli: parler avec garde
-        <BLANKLINE>
-        🏆 Quête terminée: Talk
-        <BLANKLINE>
-        True
-        >>> quest.check_action_objective("courir", "vite")
-        False
         """
-        if target:
-            objective_variations = [
-                f"{action} {target}",
-                f"{action} avec {target}",
-                f"{action} le {target}",
-                f"{action} la {target}"
-            ]
-        else:
-            objective_variations = [action]
-
-        for objective in objective_variations:
-            if self.complete_objective(objective, player):
-                return True
+        # Chercher les objectifs qui matchent l'action (case-insensitive)
+        for objective in self.objectives:
+            if objective not in self.completed_objectives:
+                objective_lower = objective.lower()
+                action_lower = action.lower()
+                
+                # Vérification simple : l'action est dans l'objectif
+                if action_lower in objective_lower:
+                    if target:
+                        target_lower = target.lower()
+                        if target_lower in objective_lower:
+                            self.complete_objective(objective, player)
+                            return True
+                    else:
+                        self.complete_objective(objective, player)
+                        return True
+        
         return False
 
 
