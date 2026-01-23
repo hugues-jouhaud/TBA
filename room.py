@@ -2,7 +2,7 @@
 from item import Item 
 
 class Room:
-    def __init__(self, name, description):
+    def __init__(self, name, description, image=None):
         self.name = name
         self.description = description
         self.image = image  # Path to image file (PNG/JPG) for this room
