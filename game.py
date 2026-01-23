@@ -535,6 +535,14 @@ class GameGUI(tk.Tk):
                   image=self._btn_down,
                   command=lambda: self._send_command("go S"),
                   bd=0).grid(row=2, column=0, columnspan=2)
+        tk.Button(move_frame,
+                  image=self._btn_up,
+                  command=lambda: self._send_command("go U"),
+                  bd=0).grid(row=0, column=7, columnspan=2)
+        tk.Button(move_frame,
+                  image=self._btn_down,
+                  command=lambda: self._send_command("go D"),
+                  bd=0).grid(row=2, column=7)
 
         # Quit button
         tk.Button(buttons_frame,
