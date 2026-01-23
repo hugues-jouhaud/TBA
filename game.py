@@ -28,7 +28,7 @@ class Game:
         self.debug = True
         self.qte_count = 0
     
-    def setup(self):
+    def setup(self,player_name=None):
         # --- COMMANDES ---
         self.commands["help"] = Command("help", " : afficher cette aide", Actions.help, 0)
         self.commands["quit"] = Command("quit", " : quitter le jeu", Actions.quit, 0)
@@ -139,8 +139,10 @@ class Game:
         self.sdb1.add_item(livre, 1)
 
         # --- JOUEUR ---
-        self.player = Player(input("\nEntrez votre nom: "))
-        self.player.set_room(self.salon)
+        if player_name is None:
+            player_name = input("\nEntrez votre nom: ")
+        self.player = Player(player_name)
+        self.player.current_room = self.salon
 
         # --- Quêtes ---
         self._setup_quests()
@@ -198,8 +200,6 @@ class Game:
         self.player.quest_manager.add_quest(mysteres_manoir)
 
     def play(self):
-        """Main game loop."""
-
         self.setup()
         self.print_welcome()
         
@@ -339,17 +339,42 @@ class Game:
             print(f"\nCommande '{command_word}' non reconnue.")
 
     def print_welcome(self):
-        """Print the welcome message."""
-        # Guard against None values
-        if not self.player or not self.player.name:
-            return
+        print(f"\nBienvenue {self.player.name} !")
+        print(self.player.current_room.get_long_description())
 
-        print(f"\nBienvenue {self.player.name} dans ce jeu d'aventure !")
-        print("Entrez 'help' si vous avez besoin d'aide.")
+    def check_win(self):
+        """Vérifie si le joueur a gagné (toutes les quêtes complétées)."""
+        all_quests = self.player.quest_manager.get_all_quests()
+        if all_quests and all(quest.is_completed for quest in all_quests):
+            self.finished = True
+            self.win()
 
-        if self.player.current_room:
-            print(self.player.current_room.get_long_description())
+    def win(self):
+        """Affiche le message de victoire."""
+        print("\n" + "="*50)
+        print("🎉 FÉLICITATIONS ! VOUS AVEZ GAGNÉ ! 🎉")
+        print("="*50)
+        print("\nVous avez accompli toutes les quêtes du manoir.")
+        print("Voici vos récompenses finales:")
+        self.player.show_rewards()
+        print("="*50 + "\n")
 
+    def lose(self):
+        """Affiche le message de défaite."""
+        print("\n" + "="*50)
+        print("💀 GAME OVER - VOUS AVEZ PERDU 💀")
+        print("="*50)
+        print("\nLe monstre vous a vaincu...")
+        print(f"Vous avez survécu à {self.qte_count} QTE(s).")
+        print("="*50 + "\n")
+
+    def unlock_secret_path(self):
+        """Déverrouille le chemin secret du bureau vers le couloir sombre."""
+        self.bureau.exits["D"] = self.clouloir1
+        print("\n" + "="*50)
+        print("✨ Un passage secret s'ouvre dans le bureau !")
+        print("Une porte vers le couloir sombre devient accessible...")
+        print("="*50 + "\n")
 
 ##############################
 # Tkinter GUI Implementation #
@@ -370,7 +395,32 @@ class _StdoutRedirector:
 
     def flush(self):
         """Flush method required by sys.stdout interface (no-op for Text widget)."""
+    def win(self):
+        """Affiche le message de victoire."""
+        print("\n" + "="*50)
+        print("🎉 FÉLICITATIONS ! VOUS AVEZ GAGNÉ ! 🎉")
+        print("="*50)
+        print("\nVous avez accompli toutes les quêtes du manoir.")
+        print("Voici vos récompenses finales:")
+        self.player.show_rewards()
+        print("="*50 + "\n")
 
+    def lose(self):
+        """Affiche le message de défaite."""
+        print("\n" + "="*50)
+        print("💀 GAME OVER - VOUS AVEZ PERDU 💀")
+        print("="*50)
+        print("\nLe monstre vous a vaincu...")
+        print(f"Vous avez survécu à {self.qte_count} QTE(s).")
+        print("="*50 + "\n")
+
+    def unlock_secret_path(self):
+        """Déverrouille le chemin secret du bureau vers le couloir sombre."""
+        self.bureau.exits["D"] = self.clouloir1
+        print("\n" + "="*50)
+        print("✨ Un passage secret s'ouvre dans le bureau !")
+        print("Une porte vers le couloir sombre devient accessible...")
+        print("="*50 + "\n")
 
 class GameGUI(tk.Tk):
     """Tkinter GUI for the text-based adventure game.
@@ -607,4 +657,4 @@ def main():
 
 
 if __name__ == "__main__":
-    Game().play()
+    main()
