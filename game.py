@@ -62,8 +62,27 @@ class Game:
         self.cuisine = Room("Cuisine", "dans une cuisine aux couteaux rouillés")
         self.sam = Room("Salle a manger", "dans une grande salle à manger")
         self.salon = Room("salon", "dans un salon confortable avec une cheminée")
+        self.salon.image = "salon.png"
         self.ch1 = Room("Chambre 1", "dans la chambre principale")
         self.sdb1 = Room("Salle de bain 1", "dans une petite salle de bain carrelée")
+        # --- ASSOCIATION DES IMAGES ---
+        self.cave.image = "cave.png"
+        self.rituel.image = "rituel.png"
+        self.stock1.image = "stockage1.png"
+        self.clouloir1.image = "couloir1.png"
+        self.prison.image = "prison.png"
+        self.sdb2.image = "salledebain2.png"
+        self.ch2.image = "chambre2.png"
+        self.clouloir2.image = "couloir2.png"
+        self.stock2.image = "stockage2.png"
+        self.bureau.image = "bureau.png"
+        self.balcon.image = "balcon.png"
+        self.safe.image = "safe.png"
+        self.cuisine.image = "cuisine.png"
+        self.sam.image = "salleamanger.png"
+        self.salon.image = "salon.png"
+        self.ch1.image = "chambre1.png"
+        self.sdb1.image = "salledebain1.png"
 
         self.rooms.extend([
             self.cave, self.rituel, self.stock1, self.clouloir1, self.prison,
@@ -603,8 +622,12 @@ class GameGUI(tk.Tk):
                 self.IMAGE_HEIGHT/2,
                 image=self._image_ref
             )
-        except (FileNotFoundError, tk.TclError):
+        except (FileNotFoundError, tk.TclError) as e:
             # Fallback to text if image not found or cannot be loaded
+
+            print(f"[ERREUR IMAGE] Impossible de charger : {image_path}")
+            print(f"[DÉTAIL] {e}")
+
             self.canvas.delete("all")
             self.canvas.create_text(
                 self.IMAGE_WIDTH/2,
