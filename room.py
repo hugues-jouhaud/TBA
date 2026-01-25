@@ -2,9 +2,10 @@
 from item import Item 
 
 class Room:
-    def __init__(self, name, description):
+    def __init__(self, name, description, image=None):
         self.name = name
         self.description = description
+        self.image = image  # Path to image file (PNG/JPG) for this room
         self.exits = {}
         self.items = {} # Stockage des items
     
@@ -15,10 +16,21 @@ class Room:
             return None
     
     def get_exit_string(self):
-        exit_string = "Sorties: " 
-        for exit in self.exits.keys():
-            if self.exits.get(exit) is not None:
-                exit_string += exit + ", "
+        """
+        Return a string describing the room's exits.
+        
+        >>> room1 = Room("Room1", "dans une pièce")
+        >>> room2 = Room("Room2", "dans une autre pièce")
+        >>> room3 = Room("Room3", "dans une troisième pièce")
+        >>> room1.exits["N"] = room2
+        >>> room1.exits["E"] = room3
+        >>> room1.get_exit_string() # doctest: +ELLIPSIS
+        'Sorties: ...
+        """
+        exit_string = "Sorties: "
+        for _exit in self.exits:
+            if self.exits.get(_exit) is not None:
+                exit_string += _exit + ", "
         exit_string = exit_string.strip(", ")
         return exit_string
 

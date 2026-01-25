@@ -18,13 +18,13 @@ class Item:
         return False
 
 
-class Pile(Item):
-    """Pile d’énergie stackable."""
+class batterie(Item):
+    """batterie d’énergie stackable."""
 
     def __init__(self):
         super().__init__(
-            name="pile",
-            description="Pile permettant d'alimenter certains objets.",
+            name="batterie",
+            description="batterie permettant d'alimenter certains objets.",
             weight=0.1, 
             max_stack=20
         )
@@ -32,7 +32,7 @@ class Pile(Item):
         self.charge = 100
 
     def use(self, player):
-        print(f"Cette pile a {self.charge}/{self.capacity} énergie.")
+        print(f"Cette batterie a {self.charge}/{self.capacity} énergie.")
         return True
 
     def consume(self, amount):

@@ -100,7 +100,7 @@ class Character:
         # 2. Lister les sorties qui ne sont pas "None"
         sorties_valides = [
             salle for salle in self.current_room.exits.values()
-            if salle is not None
+            if salle is not None and salle.name != "Safe"  # Bloque l'accès au Safe
         ]
         
         if not sorties_valides:
@@ -113,23 +113,28 @@ class Character:
         
         nouvelle_salle = None
 
-        # Si le joueur est repéré (distance <= 2) et pas dans la même salle (> 0)
-        # On vérifie aussi que le chemin existe (!= -1)
-        if 0 < dist_actuelle <= 2:
-            print("Le monstre a senti votre présence...")
-            
-            meilleure_distance = 9999 # Nombre arbitraire grand
-            
-            # On teste chaque sortie possible
-            for sortie in sorties_valides:
-                # On calcule la distance SI le monstre prenait cette sortie
-                dist_depuis_sortie = self.distance_du_joueur(player_room, depart=sortie)
+        # Si le joueur est dans la Safe room, on force le mode aléatoire (le monstre ne chasse pas)
+        joueur_est_safe = (player_room.name == "Safe")
+
+        if not joueur_est_safe:
+            dist_actuelle = self.distance_du_joueur(player_room)
+            # Si le joueur est repéré (distance <= 2) et pas dans la même salle (> 0)
+            # On vérifie aussi que le chemin existe (!= -1)
+            if 0 < dist_actuelle <= 2:
+                print("Le monstre a senti votre présence...")
                 
-                # Si cette sortie mène au joueur et est plus courte que ce qu'on a trouvé
-                if dist_depuis_sortie != -1 and dist_depuis_sortie < meilleure_distance:
-                    meilleure_distance = dist_depuis_sortie
-                    nouvelle_salle = sortie
-        
+                meilleure_distance = 9999 # Nombre arbitraire grand
+                
+                # On teste chaque sortie possible
+                for sortie in sorties_valides:
+                    # On calcule la distance SI le monstre prenait cette sortie
+                    dist_depuis_sortie = self.distance_du_joueur(player_room, depart=sortie)
+                    
+                    # Si cette sortie mène au joueur et est plus courte que ce qu'on a trouvé
+                    if dist_depuis_sortie != -1 and dist_depuis_sortie < meilleure_distance:
+                        meilleure_distance = dist_depuis_sortie
+                        nouvelle_salle = sortie
+            
         # --- LOGIQUE ALEATOIRE (FALLBACK) ---
         
         # Si on n'a pas trouvé de chemin de chasse ou si le joueur est trop loin
