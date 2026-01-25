@@ -24,6 +24,7 @@ class Player:
         self.hp = 2
         self.room_history = []
         self.prev_room = []
+        self.max_weight = 10.0
         
         # --- AJOUT QUÊTES ---
         self.move_count = 0
@@ -35,11 +36,24 @@ class Player:
         self.current_room = room
 
     def add_item(self, item, amount=1):
+        # 1. Calcul du poids actuel
+        current_weight = 0
+        for slot in self.inventory.slots:
+            if slot:
+                current_weight += slot.item.weight * slot.quantity
+        
+        # 2. Vérification si on dépasse le max avec le nouvel objet
+        if current_weight + (item.weight * amount) > self.max_weight:
+            print(f"\n Trop lourd ! ({item.name} pèse {item.weight}kg)")
+            print(f"Poids actuel : {current_weight}/{self.max_weight}kg")
+            return False
+
+        # 3. Ajout normal si le poids est OK
         if self.inventory.add_item(item, amount):
             print(f"Vous avez obtenu {amount} x {item.name}.")
             return True
         else:
-            print("Votre inventaire est plein !")
+            print("Votre inventaire est plein (slots) !")
             return False
             
     def remove_item(self, item_name, amount=1):
@@ -110,11 +124,11 @@ class Player:
         """
         if reward and reward not in self.rewards:
             self.rewards.append(reward)
-            # Ajouter la pile d'énergie à l'inventaire
-            if "Pile" in reward:
-                from item import Pile
-                pile = Pile()
-                self.inventory.add_item(pile, 1)
+            # Ajouter la batterie d'énergie à l'inventaire
+            if "batterie" in reward:
+                from item import batterie
+                batterie = batterie()
+                self.inventory.add_item(batterie, 1)
             print(f"\n🎁 Vous avez obtenu: {reward}\n")
 
     def show_rewards(self):
